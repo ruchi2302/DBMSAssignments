@@ -1,0 +1,27 @@
+CREATE TABLE RESOURCE (ID INT(5), NAME VARCHAR (500),date_Of_Joining DATE, Years_Of_Exp INT,yash_emp_id VARCHAR(500));
+
+INSERT INTO resource (id,NAME,date_of_joining,years_of_experience,yash_empId) VALUES (11,'Dharmendra Biswal','2015-04-30',2,'1003999')
+
+UPDATE resource SET years_of_experience=10 WHERE NAME='Kartik Dharmendra Jalgaonkar';
+
+DELETE FROM resource WHERE NAME='Vishal Khandu Kumkar';
+
+ALTER TABLE resource AUTO_INCREMENT=VALUE;
+
+ALTER TABLE resource ADD COLUMN location VARCHAR(15) AFTER yash_empId;
+
+ALTER TABLE resource ADD PRIMARY KEY (id);
+
+DESC resource;
+
+ALTER TABLE resource DROP years_of_experience;
+
+ALTER TABLE resource MODIFY id BIGINT;
+
+SELECT * FROM resource;
+
+SELECT * FROM resource ORDER BY date_of_joining ASC;
+
+SELECT * FROM resource ORDER BY date_of_joining DESC;
+
+SELECT * FROM resource

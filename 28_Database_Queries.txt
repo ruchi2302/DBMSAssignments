@@ -1,0 +1,155 @@
+﻿-- 1  Count the number of Non NULL rating fields in the Customers table (including repeats)
+
+SELECT COUNT(*) FROM CUSTOMER 
+WHERE RATING IS NOT NULL;
+
+-- 2 Write a query that gives the names of both the salesperson and the customer for each order after the order number
+
+SELECT SNAME,CNAME,ONUM
+FROM ORDERS o,CUSTOMER c, SALESPEOPLE s
+WHERE o.SNUM=c.SNUM AND o.snum=s.SNUM;
+
+-- 3 Count the number of Salespeople registering orders for each day. (If a salespersons has more than one order on given day, he or she should be counted only once).
+
+SELECT COUNT(ODATE) || 'sales person registering Total' ODATE
+FROM orders
+GROUP BY ODATE;
+
+-- 4  Find all orders attributed to salespeople in London.
+
+SELECT SNAME,CITY 
+FROM SALESPEOPLE 
+WHERE city='London';
+
+-- 5 Find all salespeople who have customers with more than one current order
+SELECT SALESPEOPLE.SNAME, COUNT(*) FROM SALESPEOPLE INNER JOIN CUSTOMER ON SALESPEOPLE.SNUM = CUSTOMER.SNUM 
+INNER JOIN ORDERS ON SALESPEOPLE.SNUM=ORDERS.SNUM GROUP BY SALESPEOPLE.SNAME HAVING COUNT(*)>1;
+
+
+
+-- 6   Write a query that selects all customers whose names begins with ‘C’.
+
+SELECT * FROM CUSTOMER
+ WHERE CNAME LIKE 'C%';
+ 
+--  7   Write a query on the Customers table that will find the highest rating in each city. Put the output in this form: for the City (city) the highest rating is: (rating)
+
+SELECT 'For the city (' || CITY || '), the highest rating is : (' ||  MAX(RATING) || ')' 
+FROM CUSTOMER 
+GROUP BY CITY;
+ 
+-- 8   Write a query that selects each customer’s smallest order.
+
+SELECT MIN(AMT), CNUM 
+FROM orders	
+GROUP BY CNUM;
+
+-- 9 Write a query that selects the first customer in alphabetical order whose name begins with G
+
+SELECT MIN(CNAME) FROM CUSTOMER
+ WHERE CNAME LIKE 'G%';
+
+-- 10 Write a query that counts the number of different non NULL city values in the Customers table
+
+SELECT COUNT(CNAME) empty_city
+FROM CUSTOMER WHERE CNAME IS NOT NULL;
+
+-- 11   Find the average amount from the Orders table.
+
+SELECT AVG(AMT)
+FROM orders;
+
+-- 12   Find all customers who are not located in San Jose and whose rating is above 200.
+
+SELECT CNAME FROM CUSTOMER 
+WHERE CITY <>'San Jose' AND RATING >200;
+
+-- 13
+
+SELECT c.cname,c.rating, COUNT(o.cnum) FROM customer c INNER JOIN orders o ON o.cnum=c.cnum 
+WHERE c.rating=(SELECT MAX(c.rating) FROM customer c) GROUP BY c.cname LIMIT 1; 
+ 
+ OR
+
+SELECT CASE WHEN EE = dd THEN 'Y' ELSE 'N' END AS Result 
+FROM (
+SELECT  A.CNAME, A.RATING, COUNT(o.onum)  AS dd,
+(SELECT MAX(dd) FROM (
+SELECT COUNT(ONUM) AS dd, CNUM  FROM Orders
+GROUP BY CNUM) a) AS EE
+FROM Customer A
+INNER JOIN Orders o
+ON A.Cnum = O.Cnum
+WHERE Rating = (SELECT MAX(rating) FROM Customer)
+GROUP BY A.CNAME, A.RATING
+ORDER BY dd DESC LIMIT 1) B
+
+-- 14 Find all records in the Customer table with NULL values in the city column
+
+SELECT * FROM CUSTOMER WHERE CITY IS NULL;
+
+-- 15 Arrange the Orders table by descending customer number.
+
+SELECT * FROM ORDERS ORDER BY CNUM DESC;
+
+-- 16 Find which salespeople currently have orders in the Orders table.
+
+SELECT DISTINCT SALESPEOPLE.SNAME 
+FROM SALESPEOPLE INNER JOIN ORDERS ON SALESPEOPLE.SNUM = ORDERS.SNUM;
+
+-- 17 Find the names and numbers of all salespeople who had more the one customer.
+
+SELECT SNAME, SNUM
+FROM SALESPEOPLE
+WHERE SNUM IN ( SELECT SNUM
+                             FROM CUSTOMER
+                             GROUP BY SNUM
+                             HAVING COUNT(SNUM) > 1 );
+                             
+-- 18 Count the orders of each of the salespeople and output the results in descending order.
+
+SELECT SALESPEOPLE.SNAME,COUNT(*) AS COUNT_OF_ORDER 
+FROM SALESPEOPLE INNER JOIN orders ON SALESPEOPLE.SNUM=ORDERS.SNUM 
+GROUP BY SALESPEOPLE.SNAME 
+ORDER BY COUNT_OF_ORDER DESC;
+
+-- 19 List the Customer table if and only if one or more of the Customers in the Customer table are located in San Jose.
+SELECT * FROM customer WHERE CITY IN (SELECT CITY FROM customer WHERE CITY = ‘SANJOSE’);
+
+
+
+-- 20 Find the largest order taken by each salesperson.
+SELECT SALESPEOPLE.SNAME, MAX(ORDERS.AMT) 
+FROM SALESPEOPLE INNER JOIN ORDERS ON SALESPEOPLE.SNUM = ORDERS.SNUM 
+GROUP BY SALESPEOPLE.SNAME;
+
+-- 21 Find customers in San Jose who have a rating above 200.
+SELECT * FROM CUSTOMER WHERE CITY = 'SANJOSE' AND RATING > 200;
+
+-- 22 List all the orders of salesperson Motika from the Orders table.
+SELECT ORDERS.* FROM ORDERS INNER JOIN SALESPEOPLE ON ORDERS.SNUM=SALESPEOPLE.SNUM 
+WHERE SALESPEOPLE.SNAME = 'MOTIKA';
+
+-- 23 Find salespeople who have multiple customers.
+SELECT * FROM SALESPEOPLE 
+WHERE SNUM IN (SELECT SNUM FROM CUSTOMER GROUP BY SNUM HAVING COUNT(*)>1);
+
+-- 24 Find salespeople with customers located in their city.
+SELECT SALESPEOPLE.SNAME 
+FROM SALESPEOPLE
+ WHERE SNUM IN(SELECT SNUM FROM CUSTOMER WHERE SALESPEOPLE.CITY = CUSTOMER.CITY);
+
+
+-- 25 Find the largest orders for serres and Rifkin
+SELECT MAX(AMT) FROM ORDERS WHERE SNUM IN (SELECT SNUM FROM SALESPEOPLE WHERE SNAME IN ('SERRES','RIKKLIN') ) GROUP BY SNUM;
+
+
+-- 26 Find all salespeople that are located in either Barcelona or London
+SELECT SALESPEOPLE.SNAME FROM SALESPEOPLE WHERE CITY IN ('Barcelona','London');
+
+--  27 Find all salespeople with only one customer
+SELECT SALESPEOPLE.SNAME FROM SALESPEOPLE WHERE SNUM IN (SELECT SNUM FROM CUSTOMER GROUP BY SNUM HAVING COUNT(*)=1);
+
+-- 28Find salespeople  whose  sales  IS  greater  the  AVG  sales.
+
+SELECT SNAME,COMM FROM salespeople WHERE  COMM > (SELECT AVG(COMM) FROM salespeople );
